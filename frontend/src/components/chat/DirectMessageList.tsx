@@ -1,22 +1,25 @@
-import DirectMessageCard from '@/components/chat/DirectMessageCard'
-import { useChatStore } from '@/stores/useChatStore'
+import { useChatStore } from "@/stores/useChatStore";
+import DirectMessageCard from "./DirectMessageCard";
 
 const DirectMessageList = () => {
-  const { conversations } = useChatStore()
+  const { conversations } = useChatStore();
 
-  if (!conversations) return
+  if (!conversations) return;
 
   const directConversations = conversations.filter(
-    (convo) => convo.type === 'direct'
-  )
+    (convo) => convo.type === "direct"
+  );
 
   return (
-    <div className="flex-1 overflow-auto p-2 space-y-2">
+    <div className="flex-1 overflow-y-auto p-2 space-y-2">
       {directConversations.map((convo) => (
-        <DirectMessageCard convo={convo} key={convo._id} />
+        <DirectMessageCard
+          convo={convo}
+          key={convo._id}
+        />
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default DirectMessageList
+export default DirectMessageList;

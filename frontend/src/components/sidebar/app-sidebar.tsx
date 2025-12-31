@@ -1,7 +1,4 @@
-'use client'
-
-import * as React from 'react'
-import { Moon, Sun } from 'lucide-react'
+import { NavUser } from "@/components/sidebar/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -13,25 +10,31 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
-} from '@/components/ui/sidebar'
-import { Switch } from '@/components/ui/switch'
-import CreateNewChat from '@/components/chat/CreateNewChat'
-import NewGroupChatModal from '@/components/chat/NewGroupChatModal'
-import GroupChatList from '@/components/chat/GroupChatList'
-import AddFriendModal from '@/components/chat/AddFriendModal'
-import DirectMessageList from '@/components/chat/DirectMessageList'
-import { useThemeStore } from '@/stores/useThemeStore'
-import { NavUser } from '@/components/sidebar/nav-user'
-import { useAuthStore } from '@/stores/useAuthStore'
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import { Moon, Sun } from "lucide-react";
+import { Switch } from "../ui/switch";
+import CreateNewChat from "../chat/CreateNewChat";
+import NewGroupChatModal from "../chat/NewGroupChatModal";
+import GroupChatList from "../chat/GroupChatList";
+import AddFriendModal from "../chat/AddFriendModal";
+import DirectMessageList from "../chat/DirectMessageList";
+import { useThemeStore } from "@/stores/useThemeStore";
+import { useAuthStore } from "@/stores/useAuthStore";
+import ConversationSkeleton from "../skeleton/ConversationSkeleton";
+import { useChatStore } from "@/stores/useChatStore";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { isDark, toogleTheme } = useThemeStore()
-
-  const { user } = useAuthStore()
+  const { isDark, toggleTheme } = useThemeStore();
+  const { user } = useAuthStore();
+  const { convoLoading } = useChatStore();
 
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar
+      variant="inset"
+      {...props}
+    >
+      {/* Header */}
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -47,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <Sun className="size-4 text-white/80" />
                     <Switch
                       checked={isDark}
-                      onCheckedChange={toogleTheme}
+                      onCheckedChange={toggleTheme}
                       className="data-[state=checked]:bg-background/80"
                     />
                     <Moon className="size-4 text-white/80" />
@@ -59,37 +62,45 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
 
+      {/* Content */}
       <SidebarContent className="beautiful-scrollbar">
+        {/* New Chat */}
         <SidebarGroup>
           <SidebarGroupContent>
             <CreateNewChat />
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Group Chat */}
         <SidebarGroup>
-          <SidebarGroupLabel className="uppercase">Nhóm chat</SidebarGroupLabel>
-          <SidebarGroupAction title="Tạo Nhóm" className="cursor-pointer">
+          <div className="flex items-center justify-between">
+            <SidebarGroupLabel className="uppercase">nhóm chat</SidebarGroupLabel>
             <NewGroupChatModal />
-          </SidebarGroupAction>
+          </div>
 
           <SidebarGroupContent>
-            <GroupChatList />
+            {convoLoading ? <ConversationSkeleton /> : <GroupChatList />}
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Dirrect Message */}
         <SidebarGroup>
-          <SidebarGroupLabel className="uppercase">Bạn bè</SidebarGroupLabel>
-          <SidebarGroupAction title="Kết bạn" className="cursor-pointer">
+          <SidebarGroupLabel className="uppercase">bạn bè</SidebarGroupLabel>
+          <SidebarGroupAction
+            title="Kết Bạn"
+            className="cursor-pointer"
+          >
             <AddFriendModal />
           </SidebarGroupAction>
 
           <SidebarGroupContent>
-            <DirectMessageList />
+            {convoLoading ? <ConversationSkeleton /> : <DirectMessageList />}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
+      {/* Footer */}
       <SidebarFooter>{user && <NavUser user={user} />}</SidebarFooter>
     </Sidebar>
-  )
+  );
 }

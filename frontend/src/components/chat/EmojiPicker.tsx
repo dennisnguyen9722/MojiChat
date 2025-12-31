@@ -1,17 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Popover, PopoverContent } from '@/components/ui/popover'
-import { useThemeStore } from '@/stores/useThemeStore'
-import { PopoverTrigger } from '@radix-ui/react-popover'
-import { Smile } from 'lucide-react'
-import Picker from '@emoji-mart/react'
-import data from '@emoji-mart/data'
+import { useThemeStore } from "@/stores/useThemeStore";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Smile } from "lucide-react";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
 
 interface EmojiPickerProps {
-  onChange: (value: string) => void
+  onChange: (value: string) => void;
 }
 
 const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
-  const { isDark } = useThemeStore()
+  const { isDark } = useThemeStore();
 
   return (
     <Popover>
@@ -22,17 +20,17 @@ const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
       <PopoverContent
         side="right"
         sideOffset={40}
-        className="bg-transparent border-none shadow-none drop-shadow-none mb-12"
+        className="bg-tranparent border-none shadow-none drop-shadow-none mb-12"
       >
         <Picker
-          theme={isDark ? 'dark' : 'light'}
+          theme={isDark ? "dark" : "light"}
           data={data}
           onEmojiSelect={(emoji: any) => onChange(emoji.native)}
           emojiSize={24}
         />
       </PopoverContent>
     </Popover>
-  )
-}
+  );
+};
 
-export default EmojiPicker
+export default EmojiPicker;

@@ -1,15 +1,15 @@
-import UserAvatar from '@/components/chat/UserAvatar'
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { cn, formatMessageTime } from '@/lib/utils'
-import type { Conversation, Message, Participant } from '@/types/chat'
+import { cn, formatMessageTime } from "@/lib/utils";
+import type { Conversation, Message, Participant } from "@/types/chat";
+import UserAvatar from "./UserAvatar";
+import { Card } from "../ui/card";
+import { Badge } from "../ui/badge";
 
 interface MessageItemProps {
-  message: Message
-  index: number
-  messages: Message[]
-  selectedConvo: Conversation
-  lastMessageStatus: 'delivered' | 'seen'
+  message: Message;
+  index: number;
+  messages: Message[];
+  selectedConvo: Conversation;
+  lastMessageStatus: "delivered" | "seen";
 }
 
 const MessageItem = ({
@@ -17,80 +17,84 @@ const MessageItem = ({
   index,
   messages,
   selectedConvo,
-  lastMessageStatus
+  lastMessageStatus,
 }: MessageItemProps) => {
-  const prev = messages[index - 1]
+  const prev = index + 1 < messages.length ? messages[index + 1] : undefined;
 
-  const isGroupBreak =
+  const isShowTime =
     index === 0 ||
-    message.senderId !== prev?.senderId ||
     new Date(message.createdAt).getTime() -
       new Date(prev?.createdAt || 0).getTime() >
-      300000
+      300000; // 5 phút
+
+  const isGroupBreak = isShowTime || message.senderId !== prev?.senderId;
 
   const participant = selectedConvo.participants.find(
     (p: Participant) => p._id.toString() === message.senderId.toString()
-  )
+  );
+
   return (
-    <div
-      className={cn(
-        'flex gap-2 message-bounce mt-1',
-        message.isOwn ? 'justify-end' : 'justify-start'
-      )}
-    >
-      {!message.isOwn && (
-        <div className="w-8">
-          {isGroupBreak && (
-            <UserAvatar
-              type="chat"
-              name={participant?.displayName ?? 'Moji'}
-              avatarUrl={participant?.avatarUrl ?? undefined}
-            />
-          )}
-        </div>
+    <>
+      {/* time */}
+      {isShowTime && (
+        <span className="flex justify-center text-xs text-muted-foreground px-1">
+          {formatMessageTime(new Date(message.createdAt))}
+        </span>
       )}
 
       <div
         className={cn(
-          'max-w-xs lg:max-w-md space-y-1 flex flex-col',
-          message.isOwn ? 'items-end' : 'items-start'
+          "flex gap-2 message-bounce mt-1",
+          message.isOwn ? "justify-end" : "justify-start"
         )}
       >
-        <Card
+        {/* avatar */}
+        {!message.isOwn && (
+          <div className="w-8">
+            {isGroupBreak && (
+              <UserAvatar
+                type="chat"
+                name={participant?.displayName ?? "Moji"}
+                avatarUrl={participant?.avatarUrl ?? undefined}
+              />
+            )}
+          </div>
+        )}
+
+        {/* tin nhắn */}
+        <div
           className={cn(
-            'p-3',
-            message.isOwn
-              ? 'chat-bubble-sent border-0'
-              : 'bg-chat-bubble-received'
+            "max-w-xs lg:max-w-md space-y-1 flex flex-col",
+            message.isOwn ? "items-end" : "items-start"
           )}
         >
-          <p className="text-sm leading-relaxed break-words">
-            {message.content}
-          </p>
-        </Card>
-
-        {isGroupBreak && (
-          <span className="text-xm text-muted-foreground px-1">
-            {formatMessageTime(new Date(message.createdAt))}
-          </span>
-        )}
-
-        {message.isOwn && message._id === selectedConvo.lastMessage?._id && (
-          <Badge
-            variant="outline"
+          <Card
             className={cn(
-              'text-xs px-1.5 py-0.5 h-4 border-0',
-              lastMessageStatus === 'seen'
-                ? 'bg-primary/20 text-primary'
-                : 'bg-muted text-muted-foreground'
+              "p-3",
+              message.isOwn ? "chat-bubble-sent border-0" : "chat-bubble-received"
             )}
           >
-            {lastMessageStatus}
-          </Badge>
-        )}
-      </div>
-    </div>
-  )
-}
+            <p className="text-sm leading-relaxed break-words">{message.content}</p>
+          </Card>
 
-export default MessageItem
+          {/* seen/ delivered */}
+          {message.isOwn && message._id === selectedConvo.lastMessage?._id && (
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-xs px-1.5 py-0.5 h-4 border-0",
+                lastMessageStatus === "seen"
+                  ? "bg-primary/20 text-primary"
+                  : "bg-muted text-muted-foreground"
+              )}
+            >
+              {lastMessageStatus}
+            </Badge>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default MessageItem;
